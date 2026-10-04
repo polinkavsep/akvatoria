@@ -1,0 +1,121 @@
+// ========== ИНИЦИАЛИЗАЦИЯ КАРТЫ ==========
+const map = L.map('map').setView([59.94, 30.33], 13);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap',
+    maxZoom: 19
+}).addTo(map);
+
+// Добавляем маркеры мостов
+const markers = {};
+
+BRIDGES.forEach(bridge => {
+    const marker = L.marker([bridge.lat, bridge.lng]).addTo(map);
+    marker.bindPopup(`<b>${bridge.name}</b><br>${bridge.year} г.`);
+    marker.on('click', () => showBridgeCard(bridge));
+    markers[bridge.id] = marker;
+});
+
+// ========== КАРТОЧКА МОСТА ==========
+const bridgeCard = document.getElementById('bridgeCard');
+const cardTitle = document.getElementById('cardTitle');
+const cardYear = document.getElementById('cardYear');
+const cardDesc = document.getElementById('cardDesc');
+
+function showBridgeCard(bridge) {
+    cardTitle.textContent = bridge.name;
+    cardYear.textContent = bridge.year + ' г.';
+    cardDesc.textContent = bridge.desc;
+    bridgeCard.classList.remove('hidden');
+}
+
+document.getElementById('closeCard').addEventListener('click', () => {
+    bridgeCard.classList.add('hidden');
+});
+
+// ========== AR-РЕЖИМ ==========
+const arModal = document.getElementById('arModal');
+const arOverlay = document.getElementById('arOverlay');
+
+document.getElementById('arBtn').addEventListener('click', () => {
+    arModal.classList.remove('hidden');
+    arOverlay.innerHTML = `
+        <h3>${cardTitle.textContent}</h3>
+        <p>Исторический слой активирован. Наведите камеру на мост, чтобы увидеть его историческое фото и информацию об архитекторе.</p>
+    `;
+});
+
+document.getElementById('closeAr').addEventListener('click', () => {
+    arModal.classList.add('hidden');
+});
+
+// ========== КНОПКА МАРШРУТА ==========
+document.getElementById('routeBtn').addEventListener('click', () => {
+    alert('Построение маршрута: функция в разработке. Здесь будет прокладка водного пути до моста.');
+});
+
+// ========== НАВИГАЦИЯ ПО СТРАНИЦАМ ==========
+const navLinks = document.querySelectorAll('.nav-link');
+const pages = document.querySelectorAll('.page');
+
+navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const pageId = link.dataset.page;
+
+        navLinks.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        pages.forEach(p => p.classList.remove('active'));
+        document.getElementById('page-' + pageId).classList.add('active');
+
+        if (pageId === 'map') {
+            setTimeout(() => map.invalidateSize(), 100);
+        }
+        if (pageId === 'bridges') {
+            renderBridgeList();
+        }
+    });
+});
+
+// ========== СПИСОК РАЗВОДА МОСТОВ ==========
+function renderBridgeList() {
+    const list = document.getElementById('bridgeList');
+    list.innerHTML = '';
+
+    BRIDGES.forEach(bridge => {
+        const s = bridge.schedule;
+        const statusClass = s.status === 'red' ? 'red' : 'green';
+        const statusText = s.status === 'red' ? 'Разведен' : 'Сведен';
+        const timeText = s.status === 'red' ? s.разведен : '—';
+
+        const item = document.createElement('div');
+        item.className = 'bridge-item';
+        item.innerHTML = `
+            <div class="name">
+                <span class="dot ${statusClass}"></span>
+                ${bridge.name}
+            </div>
+            <div class="time ${statusClass}">
+                ${timeText} ${s.status === 'red' ? '' : '• ' + statusText}
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
+// ========== ПОИСК ==========
+document.getElementById('searchInput').addEventListener('input', (e) => {
+    const query = e.target.value.toLowerCase().trim();
+    if (!query) return;
+
+    const found = BRIDGES.find(b => b.name.toLowerCase().includes(query));
+    if (found) {
+        map.setView([found.lat, found.lng], 15);
+        markers[found.id].openPopup();
+        showBridgeCard(found);
+    }
+});
+
+// Инициализация
+renderBridgeList();

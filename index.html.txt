@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Акватория — навигатор по воде</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+    <!-- ШАПКА -->
+    <header class="header">
+        <div class="logo">🌊 Акватория</div>
+        <nav class="nav">
+            <a href="#" class="nav-link active" data-page="map">Карта</a>
+            <a href="#" class="nav-link" data-page="bridges">Развод мостов</a>
+            <a href="#" class="nav-link" data-page="about">О проекте</a>
+        </nav>
+    </header>
+
+    <!-- СТРАНИЦА: КАРТА -->
+    <main class="page active" id="page-map">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Поиск моста или причала...">
+        </div>
+        <div id="map"></div>
+
+        <!-- Карточка моста -->
+        <div class="bridge-card hidden" id="bridgeCard">
+            <button class="close-btn" id="closeCard">✕</button>
+            <div class="bridge-card-header">
+                <h2 id="cardTitle">Название</h2>
+                <span class="badge" id="cardYear">Год</span>
+            </div>
+            <p class="bridge-desc" id="cardDesc">Описание</p>
+            <div class="btn-group">
+                <button class="btn btn-primary" id="arBtn">📷 AR-режим</button>
+                <button class="btn btn-secondary" id="routeBtn">🗺️ Маршрут</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- СТРАНИЦА: РАЗВОД МОСТОВ -->
+    <main class="page" id="page-bridges">
+        <div class="container">
+            <h1>График развода мостов</h1>
+            <p class="subtitle">Актуально на сегодня</p>
+            <div class="bridge-list" id="bridgeList"></div>
+        </div>
+    </main>
+
+    <!-- СТРАНИЦА: О ПРОЕКТЕ -->
+    <main class="page" id="page-about">
+        <div class="container">
+            <h1>О проекте «Акватория»</h1>
+            <p>Цифровой навигатор по водным маршрутам и мостам Санкт-Петербурга с AR-историческими слоями.</p>
+            <h2>Возможности</h2>
+            <ul>
+                <li>Карта рек, каналов и мостов с навигацией по воде</li>
+                <li>AR-слой с исторической информацией</li>
+                <li>ML-распознавание объектов через камеру</li>
+                <li>Прогноз развода мостов и навигационных ограничений</li>
+            </ul>
+        </div>
+    </main>
+
+    <!-- AR-модальное окно -->
+    <div class="ar-modal hidden" id="arModal">
+        <button class="close-btn ar-close" id="closeAr">✕</button>
+        <div class="ar-content">
+            <div class="ar-camera">
+                <div class="ar-overlay" id="arOverlay">
+                    <h3>Исторический слой</h3>
+                    <p>Наведите камеру на мост, чтобы увидеть его историческое фото</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
